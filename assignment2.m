@@ -1,0 +1,66 @@
+clc
+clear
+close all
+%...........PART_1..........
+t=0:0.1:15;
+x_t=sin(0.2*pi*t);
+%...........PART_2..........
+t_s=t(1:2:length(x_t));
+x_s=x_t(1:2:length(x_t));
+%...........PART_3..........
+[ t_q x_q SQNR ] = QuantizerASS2( 16,x_s);
+%...........PART_4..........
+%length(x_q)
+%disp(t_q);
+for i=1:length(x_q)
+   x_q(i)=find(t_q==x_q(i))-1;
+end
+s=unique(x_q);
+s_count=zeros(1,length(s));
+p=zeros(1,length(s));
+for i=1:length(x_q)
+    for j=1:length(s)
+        if s(j)==x_q(i)
+            p(j)=p(j)+1;
+        end
+    end
+end
+p=p/length(x_q);
+I=zeros(1,length(s));
+for i=1:length(p)
+    I(i)=-log2(p(i));
+end
+v=ceil(I);
+h=0;
+for i=1:length(p)
+    h=h+p(i)*I(i);
+end
+l=0;
+for i=1:length(p)
+    l=l+p(i)*v(i);
+end
+eff=(h*100)/l;%efficiency
+cr=4/l;%compression ratio
+disp(eff);
+disp(cr);
+%..........PART_5........
+[dict,l]=huffmandict(s,p);
+sourceencodedSignal=huffmanenco(x_q,dict);
+%..........PART_8........
+sourcedecodedSignal=huffmandeco(sourceencodedSignal,dict);
+%..........PART_7........
+recievedSignal=sourcedecodedSignal;
+%t_q(1)
+for c=1:length(sourcedecodedSignal)
+    tmp=sourcedecodedSignal(c);
+    if(tmp==0)
+     recievedSignal(c)=t_q(1);
+    
+    else
+     recievedSignal(c)=t_q(tmp+1);
+     
+    end
+end
+stem(t_s,x_s);
+hold on
+stem(t_s,recievedSignal);

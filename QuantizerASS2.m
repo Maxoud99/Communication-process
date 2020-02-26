@@ -1,0 +1,44 @@
+function [ xq q SQNR ] = QuantizerASS2( l,xs )
+a=1;
+b=-1;
+delta=(a-b)/l;
+ xNeg=[-delta/2];
+ neg=xNeg;
+ xPos=[delta/2];
+ pos=xPos;
+ c1=1;
+ for c=1:l/2-1
+     xNeg=[xNeg,neg+delta*-c1];
+     xPos=[xPos,pos+delta*c1];
+     c1=c1+1;
+ end
+ xq=[fliplr(xNeg),xPos];
+value=xNeg(1);
+for c=1:length(xs)
+   if xs(c)<0
+       value=xNeg(1);
+       for c1=1:length(xNeg)
+           m=(abs(value-xs(c)));       
+          subt=(abs(xNeg(c1)-xs(c)));
+          if(subt<m)
+             value=xNeg(c1);
+          end
+       end
+   end
+   if xs(c)>0
+       value=xPos(1);
+       for c2=1:length(xPos)
+           m=abs(value-xs(c));
+          subt=abs(xPos(c2)-xs(c));
+          if(subt<m)
+             value=xPos(c2);
+          end
+       end
+   end
+   q(c)=value;
+end
+SQNR=3*l*l
+end
+
+
+
